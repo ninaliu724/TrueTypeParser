@@ -23,8 +23,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,6 +74,7 @@ public class TTFFile {
   private String notice = "";
   private String subFamilyName = "";
   private int weightClass;
+  private Map<Integer, List<Integer>> supportedLanguages = new HashMap<>();
 
   TTFFile() {
 
@@ -124,6 +127,15 @@ public class TTFFile {
    */
   public int getWeightClass() {
     return weightClass;
+  }
+
+  /**
+   * Returns the supported language IDs of this font.
+   *
+   * @return  Map of the platform IDs to the language IDs
+   */
+  public Map<Integer, List<Integer>> getSupportedLanguages() {
+    return supportedLanguages;
   }
 
   /**
@@ -190,6 +202,15 @@ public class TTFFile {
       int platformID = fontFile.readTTFUShort();
       int encodingID = fontFile.readTTFUShort();
       int languageID = fontFile.readTTFUShort();
+
+      if (supportedLanguages.containsKey(platformID)) {
+        List<Integer> languages = supportedLanguages.get(platformID);
+        languages.add(languageID);
+      } else {
+        List<Integer> languages = new ArrayList<>();
+        languages.add(languageID);
+        supportedLanguages.put(platformID, languages);
+      }
 
       int k = fontFile.readTTFUShort();
       int l = fontFile.readTTFUShort();
